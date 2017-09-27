@@ -37,9 +37,9 @@ namespace BankAccountKata
         public void receive_a_deposit()
         {
             var account = new Account();
-            var amount = 10m;
+            var amount = new Amount(10m);
             account.Deposit(amount);
-            account.Balance.Value.Should().Be(amount);
+            account.Balance.Value.Should().Be(amount.Value);
         }
 
         [Fact]
@@ -62,9 +62,9 @@ namespace BankAccountKata
 
         public Amount Balance { get; set; }
 
-        public void Deposit(decimal amount)
+        public void Deposit(Amount amount)
         {
-            Balance.Value += amount;
+            Balance.Value += amount.Value;
         }
 
         public void Withdrawal(Amount amount)
