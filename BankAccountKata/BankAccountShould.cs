@@ -99,11 +99,7 @@ namespace BankAccountKata
         public void Withdrawal(Amount amount)
         {
             Balance.Value -= amount.Value;
-            _movements.Add(new Movement()
-            {
-                Type = MovementType.Withdrawal,
-                Amount = amount
-            });
+            _movements.Add(new Movement(MovementType.Withdrawal, amount));
         }
 
         public void Transfer(Account destiny, Amount amount)
@@ -115,8 +111,14 @@ namespace BankAccountKata
 
     public class Movement
     {
-        public MovementType Type { get; set; }
-        public Amount Amount { get; set; } = new Amount();
+        public Movement(MovementType type, Amount amount)
+        {
+            Type = type;
+            Amount = amount;
+        }
+
+        public MovementType Type { get; }
+        public Amount Amount { get; }
     }
 
     public enum MovementType
