@@ -69,6 +69,9 @@ namespace BankAccountKata
             var account = Builder.AccountBuilder().WithBalance(new Amount(10m)).Build();
             account.Withdrawal(new Amount(6));
             account.Movements.Count().Should().Be(1);
+            var movement = account.Movements.First();
+            movement.Type.Should().Be(MovementType.Withdrawal);
+            movement.Amount.Value.Should().Be(6);
         }
     }
 
@@ -80,7 +83,7 @@ namespace BankAccountKata
         public Account()
         {
             Balance = new Amount();
-            _movements=new List<Movement>();
+            _movements = new List<Movement>();
         }
 
 
@@ -96,7 +99,11 @@ namespace BankAccountKata
         public void Withdrawal(Amount amount)
         {
             Balance.Value -= amount.Value;
-            _movements.Add(new Movement());
+            _movements.Add(new Movement()
+            {
+                Type = MovementType.Withdrawal,
+                Amount = amount
+            });
         }
 
         public void Transfer(Account destiny, Amount amount)
@@ -108,6 +115,13 @@ namespace BankAccountKata
 
     public class Movement
     {
+        public MovementType Type { get; set; }
+        public Amount Amount { get; set; } = new Amount();
+    }
+
+    public enum MovementType
+    {
+        Withdrawal
     }
 
     public class Amount
