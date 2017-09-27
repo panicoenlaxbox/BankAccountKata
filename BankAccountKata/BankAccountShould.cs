@@ -84,6 +84,17 @@ namespace BankAccountKata
             movement.Type.Should().Be(MovementType.Deposit);
             movement.Amount.Value.Should().Be(6);
         }
+
+        [Fact]
+        public void movement_register_date_and_balance()
+        {
+            var account = Builder.AccountBuilder().WithBalance(new Amount(10m)).Build();
+            account.Deposit(new Amount(6));
+
+            var movement = account.Movements.First();
+            movement.Date.Should().BeCloseTo(DateTime.Now);
+            movement.Balance.Value.Should().Be(16);
+        }
     }
 
 
@@ -97,7 +108,6 @@ namespace BankAccountKata
             _movements = new List<Movement>();
         }
 
-
         public Amount Balance { get; set; }
 
         public IEnumerable<Movement> Movements => _movements;
@@ -105,13 +115,18 @@ namespace BankAccountKata
         public void Deposit(Amount amount)
         {
             Balance.Value += amount.Value;
-            _movements.Add(new Movement(MovementType.Deposit, amount));
+            AddMovement(MovementType.Deposit, amount);
         }
 
         public void Withdrawal(Amount amount)
         {
             Balance.Value -= amount.Value;
-            _movements.Add(new Movement(MovementType.Withdrawal, amount));
+            AddMovement(MovementType.Withdrawal, amount);
+        }
+
+        private void AddMovement(MovementType type, Amount amount)
+        {
+            _movements.Add(new Movement(type, amount, DateTime.Now, Balance));
         }
 
         public void Transfer(Account destiny, Amount amount)
@@ -123,14 +138,18 @@ namespace BankAccountKata
 
     public class Movement
     {
-        public Movement(MovementType type, Amount amount)
+        public Movement(MovementType type, Amount amount, DateTime date, Amount balance)
         {
             Type = type;
             Amount = amount;
+            Date = date;
+            Balance= balance;
         }
 
         public MovementType Type { get; }
         public Amount Amount { get; }
+        public DateTime Date { get; }
+        public Amount Balance { get; }
     }
 
     public enum MovementType
