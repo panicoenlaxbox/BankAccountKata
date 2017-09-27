@@ -4,7 +4,7 @@ using Xunit;
 
 namespace BankAccountKata
 {
-    static class  Builder
+    static class Builder
     {
         public static AccountBuilder AccountBuilder()
         {
@@ -17,7 +17,7 @@ namespace BankAccountKata
 
         public AccountBuilder()
         {
-            _account=new Account();
+            _account = new Account();
         }
 
         public AccountBuilder WithBalance(Amount balance)
@@ -49,6 +49,16 @@ namespace BankAccountKata
             account.Withdrawal(new Amount(6));
             account.Balance.Value.Should().Be(4);
         }
+
+        [Fact]
+        public void do_a_transfer_to_another_account()
+        {
+            var source = Builder.AccountBuilder().WithBalance(new Amount(10m)).Build();
+            var destiny = Builder.AccountBuilder().WithBalance(new Amount(20m)).Build();
+            source.Transfer(destiny, new Amount(6));
+            source.Balance.Value.Should().Be(4);
+            destiny.Balance.Value.Should().Be(26);
+        }
     }
 
 
@@ -71,13 +81,19 @@ namespace BankAccountKata
         {
             Balance.Value -= amount.Value;
         }
+
+        public void Transfer(Account destiny, Amount amount)
+        {
+            Withdrawal(amount);
+            destiny.Deposit(amount);
+        }
     }
 
     public class Amount
     {
         public Amount()
         {
-            
+
         }
 
         public Amount(decimal value)
