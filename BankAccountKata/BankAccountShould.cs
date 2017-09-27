@@ -73,6 +73,17 @@ namespace BankAccountKata
             movement.Type.Should().Be(MovementType.Withdrawal);
             movement.Amount.Value.Should().Be(6);
         }
+
+        [Fact]
+        public void deposit_drop_a_account_movement()
+        {
+            var account = Builder.AccountBuilder().WithBalance(new Amount(10m)).Build();
+            account.Deposit(new Amount(6));
+            account.Movements.Count().Should().Be(1);
+            var movement = account.Movements.First();
+            movement.Type.Should().Be(MovementType.Deposit);
+            movement.Amount.Value.Should().Be(6);
+        }
     }
 
 
@@ -94,6 +105,7 @@ namespace BankAccountKata
         public void Deposit(Amount amount)
         {
             Balance.Value += amount.Value;
+            _movements.Add(new Movement(MovementType.Deposit, amount));
         }
 
         public void Withdrawal(Amount amount)
@@ -123,7 +135,8 @@ namespace BankAccountKata
 
     public enum MovementType
     {
-        Withdrawal
+        Withdrawal,
+        Deposit
     }
 
     public class Amount
