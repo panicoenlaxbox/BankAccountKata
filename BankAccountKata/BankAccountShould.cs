@@ -1,4 +1,7 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using Xunit;
 
@@ -59,18 +62,31 @@ namespace BankAccountKata
             source.Balance.Value.Should().Be(4);
             destiny.Balance.Value.Should().Be(26);
         }
+
+        [Fact]
+        public void withdrawal_drop_a_account_movement()
+        {
+            var account = Builder.AccountBuilder().WithBalance(new Amount(10m)).Build();
+            account.Withdrawal(new Amount(6));
+            account.Movements.Count().Should().Be(1);
+        }
     }
 
 
     public class Account
     {
+        private readonly IList<Movement> _movements;
+
         public Account()
         {
             Balance = new Amount();
+            _movements=new List<Movement>();
         }
 
 
         public Amount Balance { get; set; }
+
+        public IEnumerable<Movement> Movements => _movements;
 
         public void Deposit(Amount amount)
         {
@@ -80,6 +96,7 @@ namespace BankAccountKata
         public void Withdrawal(Amount amount)
         {
             Balance.Value -= amount.Value;
+            _movements.Add(new Movement());
         }
 
         public void Transfer(Account destiny, Amount amount)
@@ -87,6 +104,10 @@ namespace BankAccountKata
             Withdrawal(amount);
             destiny.Deposit(amount);
         }
+    }
+
+    public class Movement
+    {
     }
 
     public class Amount
